@@ -1,7 +1,21 @@
-/**
- * Created by slimp on 02.07.19.
- */
+trigger TerrUserTrigger on TerrUser__c (after insert, after delete, after undelete) {
 
-trigger TerrUserTrigger on TerrUser__c (after insert, after update) {
+    if (Trigger.isInsert) {
+        for (TerrUser__c terrUser : Trigger.new) {
+            TerrUserHandler.onTerrUserInsert(terrUser);
+        }
+    }
+
+    if (Trigger.isDelete) {
+        for (TerrUser__c terrUser : Trigger.new) {
+            TerrUserHandler.onTerrUserDelete(terrUser);
+        }
+    }
+
+    if(Trigger.isUndelete) {
+        for (TerrUser__c terrUser : Trigger.new) {
+            TerrUserHandler.onTerrUserInsert(terrUser);
+        }
+    }
 
 }

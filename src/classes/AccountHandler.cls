@@ -2,7 +2,7 @@ public with sharing class AccountHandler {
 
     public static void onAccountUpdate(Account account, Account oldAccount) {
         if (account.Territory__c != oldAccount.Territory__c) {
-            List<Territory__c> territoryHierarchy = TerritoryUtils.getTerritoryHierarchy(account.Territory__r);
+            List<Territory__c> territoryHierarchy = TerritoryUtils.getTerritoryHierarchy(account.Territory__c);
             List<TerrUser__c> terrUsers = [SELECT User__c, User__r.Name,User__r.IsActive FROM TerrUser__c WHERE Territory__c IN :territoryHierarchy AND User__r.IsActive = TRUE];
 
             List<SObject> sharesToDelete = new List<SObject>();
