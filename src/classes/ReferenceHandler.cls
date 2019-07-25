@@ -1,4 +1,3 @@
-
 public with sharing class ReferenceHandler {
 
     public static void onReferenceInsert(Reference__c ref) {
@@ -9,26 +8,24 @@ public with sharing class ReferenceHandler {
                 LIMIT 1
         ];
 
-        List<Territory__c> territoryHierarchy = TerritoryUtils.getTerritoryHierarchy(territory);
+        List<Territory__c> territoryHierarchy = TerritoryUtils.getTerritoryHierarchy(territory.Id);
 
-        List<TerrUser__c> terrUsers = [SELECT User__c, User__r.Name,User__r.IsActive FROM TerrUser__c WHERE Territory__c IN :territoryHierarchy];
+        List<TerrUser__c> terrUsers = [SELECT User__c, User__r.Name,User__r.IsActive FROM TerrUser__c WHERE Territory__c IN :territoryHierarchy AND User__r.IsActive = TRUE];
 
         Set<SObject> shareItems = new Set<SObject>();
         for (TerrUser__c terrUser : terrUsers) {
-            if (terrUser.User__r.IsActive) {
-                AccountShare accountShare = new AccountShare();
-                accountShare.AccountId = ref.Account__c;
-                accountShare.AccountAccessLevel = 'Read';
-                accountShare.OpportunityAccessLevel = 'Read';
-                accountShare.UserOrGroupId = terrUser.User__c;
-                shareItems.add(accountShare);
+            AccountShare accountShare = new AccountShare();
+            accountShare.AccountId = ref.Account__c;
+            accountShare.AccountAccessLevel = 'Read';
+            accountShare.OpportunityAccessLevel = 'Read';
+            accountShare.UserOrGroupId = terrUser.User__c;
+            shareItems.add(accountShare);
 
-                ContactShare contactShare = new ContactShare();
-                contactShare.ContactId = ref.Contact__c;
-                contactShare.ContactAccessLevel = 'Read';
-                contactShare.UserOrGroupId = terrUser.User__c;
-                shareItems.add(contactShare);
-            }
+            ContactShare contactShare = new ContactShare();
+            contactShare.ContactId = ref.Contact__c;
+            contactShare.ContactAccessLevel = 'Read';
+            contactShare.UserOrGroupId = terrUser.User__c;
+            shareItems.add(contactShare);
         }
         Database.SaveResult[] result = Database.insert(new List<SObject>(shareItems), false);
 
